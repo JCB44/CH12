@@ -5,7 +5,7 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "",
+  password: "love7744",
   database: "employee_db",
 });
 
@@ -37,49 +37,80 @@ function addEmployee() {
             }
           );
         });
-        });
-        }
+      });
+    }
 
         const viewEmployees = `
           SELECT employee.firstName, employee.lastName
           FROM employee`;
 
    //====================// Department functions:
-          function addDepartment() {
-            inquirer
-              .prompt([
-                {
-                  type: "input",
-                  message: "Enter a department name to add.",
-                  name: "newDepartment",
-                },
-              ])
-              .then((answer) => {
-                db.query(
-                  "INSERT INTO department (departmentName) VALUES (?)",
-                  [answer.newDepartment],
-                  (err, res) => {
-                    run();
-                  }
-                )
-              })
-          }
+function addDepartment() {
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      message: "Enter a department name to add.",
+      name: "newDepartment",
+    },
+    ])
+    .then((answer) => {
+        db.query(
+          "INSERT INTO department (departmentName) VALUES (?)",
+          [answer.newDepartment],
+          (err, res) => {
+          run();
+        }
+      )
+    })
+  }
 
- const viewDepartments = `
-          SELECT department.departmentName
-          FROM department`;
-
-
-//====================//
+    const viewDepartments = `
+      SELECT department.departmentName
+      FROM department`;
 
 
+//====================// Role Functions:
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Enter your position",
+        name: "jobTitle",
+      },
+      {
+        type: "input",
+        message: "Enter your pay",
+        name: "salary",
+      },
+      {
+        type: "input",
+        message: "Enter your department Id",
+        name: "departmentId",
+      },
+    ])
+    .then((answers) => {
+      db.query(
+        "INSERT INTO role (jobTitle, salary, departmentId) VALUES (?, ?, ?)",
+        [answers.jobTitle, answers.salary, answers.departmentId],
+        (err, dataRes) => {
+          run();
+          console.log(err)
+        }
+      );
+    });
+  }
+  const viewTitles = `
+  SELECT role.jobTitle, role.salary, department.departmentName
+  FROM role
+  JOIN department ON department.id = role.departmentId`;
 
 
 
 
 
-
-
+// reminder to seed database before running
   function run() {
     inquirer
       .prompt([
@@ -92,6 +123,8 @@ function addEmployee() {
             "Add a employee",
             "Add Department",
             "View All Departments",
+            "Add a Role",
+            "View all Roles",
           ],
         },
       ])
@@ -100,14 +133,14 @@ function addEmployee() {
           case "Add a employee":
             addEmployee();
             console.log("add employee")
-            break;
+          break;
             
-            case "View all employees":
-              db.query(viewEmployees, (err, dataRes) => {
-                if(err) throw err
-                console.table(dataRes);
-                run();
-              });
+          case "View all employees":
+            db.query(viewEmployees, (err, dataRes) => {
+              if(err) throw err
+              console.table(dataRes);
+              run();
+            });
           break;
 
           case "Add Department":
@@ -120,6 +153,17 @@ function addEmployee() {
               console.table(dataRes);
               run();
             });
+          break;
+
+          case "Add a Role":
+            addRole();
+          break;
+
+          case "View all Roles":
+          db.query(viewTitles, (err, dataRes) => {
+            console.table(dataRes);
+            run();
+          });
           break;
 
           default:
