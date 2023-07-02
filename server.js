@@ -5,7 +5,7 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "",
+  password: "love7744",
   database: "employee_db",
 });
 
@@ -39,6 +39,11 @@ function addEmployee() {
         });
         }
 
+        const viewEmployee = `
+          SELECT employee.firstName, employee.lastName
+          FROM employee`;
+
+
   function run() {
     inquirer
       .prompt([
@@ -60,7 +65,11 @@ function addEmployee() {
             break;
             
             case "View all employees":
-         console.log("temp view")
+              db.query(viewEmployee, (err, dataRes) => {
+                if(err) throw err
+                console.table(dataRes);
+                run();
+              });
           break;
           default:
           run();
