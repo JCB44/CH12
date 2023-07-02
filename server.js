@@ -5,10 +5,11 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "love7744",
+  password: "",
   database: "employee_db",
 });
 
+//====================// Employee functions:
 function addEmployee() {
     db.query("SELECT * FROM ROLE", (err, data) => {
       inquirer
@@ -39,9 +40,44 @@ function addEmployee() {
         });
         }
 
-        const viewEmployee = `
+        const viewEmployees = `
           SELECT employee.firstName, employee.lastName
           FROM employee`;
+
+   //====================// Department functions:
+          function addDepartment() {
+            inquirer
+              .prompt([
+                {
+                  type: "input",
+                  message: "Enter a department name to add.",
+                  name: "newDepartment",
+                },
+              ])
+              .then((answer) => {
+                db.query(
+                  "INSERT INTO department (departmentName) VALUES (?)",
+                  [answer.newDepartment],
+                  (err, res) => {
+                    run();
+                  }
+                )
+              })
+          }
+
+ const viewDepartments = `
+          SELECT department.departmentName
+          FROM department`;
+
+
+//====================//
+
+
+
+
+
+
+
 
 
   function run() {
@@ -54,6 +90,8 @@ function addEmployee() {
           choices: [
             "View all employees",
             "Add a employee",
+            "Add Department",
+            "View All Departments",
           ],
         },
       ])
@@ -65,12 +103,25 @@ function addEmployee() {
             break;
             
             case "View all employees":
-              db.query(viewEmployee, (err, dataRes) => {
+              db.query(viewEmployees, (err, dataRes) => {
                 if(err) throw err
                 console.table(dataRes);
                 run();
               });
           break;
+
+          case "Add Department":
+            addDepartment();
+          break;
+
+          case "View All Departments":
+            db.query(viewDepartments, (err, dataRes) => {
+              if(err) throw err
+              console.table(dataRes);
+              run();
+            });
+          break;
+
           default:
           run();
           break;
