@@ -5,7 +5,7 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "",
+  password: "love7744",
   database: "employee_db",
 });
 
@@ -126,6 +126,45 @@ function addRole() {
   FROM role
   JOIN department ON department.id = role.departmentId`;
 
+  function updateRole() {
+    db.query("SELECT * FROM employee", (err, data) => {
+      const employees = data.map((row) => {
+        return { name: `${row.firstName} ${row.lastName}`, value: row.id };
+      });
+      db.query("SELECT * FROM role", (err, data) => {
+        const newRole = data.map((row) => {
+          return { name: row.jobTitle, value: row.id };
+        });
+        console.log(employees);
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              message: "Select the employee role you would like to update",
+              name: "employeeUpdate",
+              choices: employees,
+            },
+            {
+              type: "list",
+              message:
+                "Select the new role you would like to assign",
+              name: "newRole",
+              choices: newRole,
+            },
+          ])
+          .then((answers) => {
+            console.log(answers);
+            db.query(
+              "UPDATE employee SET roleId = ? WHERE id = ?",
+              [answers.newRole, answers.employeeUpdate],
+              (err, data) => {
+                run();
+              }
+            );
+          });
+      });
+    });
+  }
 
 
 
@@ -145,6 +184,7 @@ function addRole() {
             "View All Departments",
             "Add a Role",
             "View all Roles",
+            "Update a employee role",
           ],
         },
       ])
@@ -186,11 +226,15 @@ function addRole() {
           });
           break;
 
+          case "Update a employee role":
+          updateRole();
+          break;
+
           default:
           run();
           break;
           
         }
-        });
-        }
+    });
+  }
 run()
