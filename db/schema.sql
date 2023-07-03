@@ -6,8 +6,13 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE TABLE employee (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     firstName VARCHAR(30) NOT NULL,
-    lastName VARCHAR(30) NOT NULL
-    -- REFERENCES employee(id)
+    lastName VARCHAR(30) NOT NULL,
+    roleId INT,
+    FOREIGN KEY (roleId)
+    REFERENCES role(id),
+    managerId INT,
+    FOREIGN KEY (managerId)
+    REFERENCES employee(id)
 );
 
 CREATE TABLE department (

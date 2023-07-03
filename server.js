@@ -5,32 +5,49 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "love7744",
+  password: "",
   database: "employee_db",
 });
 
 //====================// Employee functions:
+
 function addEmployee() {
-    db.query("SELECT * FROM ROLE", (err, data) => {
+  db.query("SELECT * FROM ROLE", (err, data) => {
+    const roles = data.map((row) => {
+      return { name: row.jobTitle, value: row.id };
+    });
       inquirer
         .prompt([
           {
             type: "input",
-            message: "Employees first name?",
+            message: "Enter Employees first name",
             name: "firstName",
           },
           {
             type: "input",
-            message: "Employees last name?",
+            message: "Enter Employees last name",
             name: "lastName",
+          },
+          {
+            type: "list",
+            message: "Enter Employee's role",
+            name: "roleId",
+            choices: roles,
+          },
+          {
+            type: "input",
+            message: "Enter Manager id",
+            name: "managerId",
           },
         ])
         .then((answers) => {
           db.query(
-            "INSERT INTO employee (firstName, lastName) VALUES (?, ?)",
+            "INSERT INTO employee (firstName, lastName, roleId, managerId) VALUES (?, ?, ?, ?)",
             [
               answers.firstName,
               answers.lastName,
+              answers.roleId,
+              answers.managerId,
             ],
             (err, dataRes) => {
               run();
@@ -40,9 +57,12 @@ function addEmployee() {
       });
     }
 
-        const viewEmployees = `
-          SELECT employee.firstName, employee.lastName
-          FROM employee`;
+  const viewEmployees = `
+    SELECT employee.firstName, employee.lastName, role.jobTitle, role.salary, department.departmentName, concat(manager.firstName, ' ', manager.lastName) AS managerName
+    FROM employee
+    JOIN role ON role.id = employee.roleId
+    JOIN department ON department.id = role.departmentId
+    LEFT JOIN employee manager ON manager.id = employee.managerId`;
 
    //====================// Department functions:
 function addDepartment() {
