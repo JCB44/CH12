@@ -5,12 +5,12 @@ require("console.table");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "love7744",
+  password: "",
+  // ^^^^^ Enter MYSQL password here <-----------------------
   database: "employee_db",
 });
 
 //====================// Employee functions:
-
 function addEmployee() {
   db.query("SELECT * FROM ROLE", (err, data) => {
     const roles = data.map((row) => {
@@ -51,6 +51,7 @@ function addEmployee() {
             ],
             (err, dataRes) => {
               run();
+              console.log(err)
             }
           );
         });
@@ -64,7 +65,7 @@ function addEmployee() {
     JOIN department ON department.id = role.departmentId
     LEFT JOIN employee manager ON manager.id = employee.managerId`;
 
-   //====================// Department functions:
+//====================// Department functions:
 function addDepartment() {
   inquirer
   .prompt([
@@ -80,6 +81,7 @@ function addDepartment() {
           [answer.newDepartment],
           (err, res) => {
           run();
+          console.log(err)
         }
       )
     })
@@ -88,7 +90,6 @@ function addDepartment() {
     const viewDepartments = `
       SELECT department.departmentName
       FROM department`;
-
 
 //====================// Role Functions:
 function addRole() {
@@ -121,10 +122,11 @@ function addRole() {
       );
     });
   }
-  const viewTitles = `
-  SELECT role.jobTitle, role.salary, department.departmentName
-  FROM role
-  JOIN department ON department.id = role.departmentId`;
+
+    const viewTitles = `
+      SELECT role.jobTitle, role.salary, department.departmentName
+      FROM role
+      JOIN department ON department.id = role.departmentId`;
 
   function updateRole() {
     db.query("SELECT * FROM employee", (err, data) => {
@@ -159,14 +161,13 @@ function addRole() {
               [answers.newRole, answers.employeeUpdate],
               (err, data) => {
                 run();
+                console.log(err)
               }
             );
           });
       });
     });
   }
-
-
 
 
 // reminder to seed database before running
@@ -178,8 +179,8 @@ function addRole() {
           message: "Please choose an option",
           name: "action",
           choices: [
-            "View all employees",
             "Add a employee",
+            "View all employees",
             "Add Department",
             "View All Departments",
             "Add a Role",
@@ -190,11 +191,11 @@ function addRole() {
       ])
       .then((answers) => {
         switch (answers.action) {
+          //Employee Cases
           case "Add a employee":
             addEmployee();
             console.log("add employee")
           break;
-            
           case "View all employees":
             db.query(viewEmployees, (err, dataRes) => {
               if(err) throw err
@@ -203,10 +204,10 @@ function addRole() {
             });
           break;
 
+           //Department Cases
           case "Add Department":
             addDepartment();
           break;
-
           case "View All Departments":
             db.query(viewDepartments, (err, dataRes) => {
               if(err) throw err
@@ -215,17 +216,17 @@ function addRole() {
             });
           break;
 
+          //Role Cases
           case "Add a Role":
             addRole();
           break;
-
           case "View all Roles":
-          db.query(viewTitles, (err, dataRes) => {
-            console.table(dataRes);
-            run();
+            db.query(viewTitles, (err, dataRes) => {
+              if(err) throw err
+              console.table(dataRes);
+              run();
           });
           break;
-
           case "Update a employee role":
           updateRole();
           break;
